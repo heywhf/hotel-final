@@ -19,6 +19,9 @@ base_data = {
             'queueStatus': '',
         }
 
+
+
+
 @customer.route('/')
 def homepage():
     """
@@ -27,7 +30,9 @@ def homepage():
     """
     if 'username' in session:
         if session['identification'] == '客户':
-            return render_template('customer_homepage.html')
+            function = hotel_data('')
+            session['room_temp'] = function.update_ac(session['room_id'],request.form.to_dict(),session['token'])
+            return render_template('customer_homepage.html',room_temp = session['room_temp'])
         else:
             return render_template('customer_homepage.html')
 
@@ -67,7 +72,7 @@ def post():
             if 'room_id' in session:
                 function = hotel_data('')
                 print(session)
-                function.update_ac(session['room_id'],request.form.to_dict(),session['token'])
+                session['room_temp'] = function.update_ac(session['room_id'],request.form.to_dict(),session['token'])
                 return jsonify({'msg':'成功'}),200
             else:
                 return jsonify({'msg':'请先登记入住'}),404

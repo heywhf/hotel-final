@@ -82,30 +82,35 @@ class hotel_data():
     def __str__(self) -> str:
         return self.username
 
+
     def update_ac(self, room_id, input, token):
         headers = {
             'Authorization': 'Bearer ' + token
         }
         #print(token)
-        response = requests.get(f'http://{PATH}/room-status/{int(room_id)}', headers=headers)
-        data = json.loads(response.content)
-        data['temperature'] = data['acTemperature']
+        input_data = {}
+        response = requests.get(f'http://{PATH}/room', headers=headers)
+        data = json.loads(response.content)['roomInfo']
+        if(data['queueState'] == 'IDLE'):
+            data['acState'] = False
+        elif(data['queueState'] == 'PENDING' or data['queueState'] == 'RUNNING'):
+            data['acState'] = True
+        else:
+            pass
+        for name in ['acTemperature', 'fanSpeed', 'acState', 'acMode']:
+            input_data[name] = data[name]
         for key, value in input.items():
             if (key == 'switch'):
                 if (value == 'true'):
-                    if(data['isOn'] == 0):
-                        data['isOn'] = 1
-                    elif(data['isOn'] == 1):
-                        data['isOn'] = 0
-                    else:
-                        data['isOn'] = not data['isOn']
+                    input_data['acState'] = not input_data['acState']
             else:
-                data[key] = value
-        #print(data)
-        response = requests.post(f'http://{PATH}//update-status/{int(room_id)}', json=data, headers=headers)
+                input_data[key] = value
+        print(input_data)
+        response = requests.post(f'http://{PATH}//room', json=input_data, headers=headers)
         #print(response.status_code)
-        if (response.status_code == 200):
+        if (response.status_code == 201):
             print('更新成功')
+        return data['roomTemperature']
 
     def room(self, token):
         """
@@ -147,7 +152,8 @@ class hotel_data():
             'password': password,
             'idCard': idCard,
             'phoneNumber': phone,
-            'roomName': roomNumber
+            'roomName': roomNumber,
+            'role':'customer'
         }
         headers = {
             'Authorization': 'Bearer ' + token
@@ -166,7 +172,7 @@ class hotel_data():
             'Authorization': 'Bearer ' + token
         }
         data = {
-            'roomNumber':int(room_id)
+            'roomName':int(room_id)
         }
         response = requests.post(f'http://{PATH}/check-out',json=data,headers=headers)
         if response.status_code == 201:

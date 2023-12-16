@@ -166,7 +166,7 @@ def print_receipt():
         else:
             dic = hotel_data(session['username'])
             room_id = request.args.get('element')
-            data = dic.check_room_expense(room_id,session['token'])
+            data = dic.check_room_expense(room_id, session['token'])
             if data:
                 df = pd.DataFrame(data)
                 filename = f'checkout_{room_id}.xlsx'
@@ -253,6 +253,27 @@ def log_out():
             return redirect(url_for('customer.homepage'))
         else:
             session.clear()
+            return redirect(url_for('log_and_submit.login'))
+    else:
+        # 连注册都没注册的话送到登录页面去
+        return redirect(url_for('log_and_submit.login'))
+
+
+@hotel_receptionist.route('/query_all_room/')
+def query_all_room_detail():
+    """
+    查询所有房间的信息
+    :return :下载excel表格
+    """
+    if 'username' in session:
+        # 检查是不是前台，是的话返回前台首页，不是的话返回顾客首页
+        if session['identification'] == '客户':
+            return redirect(url_for('customer.homepage'))
+        else:
+            dic = hotel_data(session['username'])
+            rooms=dic.query_all_room()
+            return render_template('query_all_rooms.html', rooms=rooms)
+
     else:
         # 连注册都没注册的话送到登录页面去
         return redirect(url_for('log_and_submit.login'))

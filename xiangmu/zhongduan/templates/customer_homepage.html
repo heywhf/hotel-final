@@ -36,17 +36,17 @@
         <form id="myForm">
             <label for="mode">模式:</label>
             <select id="mode">
-                <option value="cool">制冷</option>
-                <option value="heat">制热</option>
+                <option value="COOL">制冷</option>
+                <option value="HEAT">制热</option>
             </select>
 
             <label for="fanSpeed">风速:</label>
             <select id="fanSpeed">
-                <option value="low">低速</option>
-                <option value="medium">中速</option>
-                <option value="high">高速</option>
+                <option value="LOW">低速</option>
+                <option value="MEDIUM">中速</option>
+                <option value="HIGH">高速</option>
             </select>
-
+            <div class="temp-display" id="room_temperature">{{room_temp}}</div>
             <div class="temp-display" id="temperature">24°C</div>
             <div class="temp-buttons">
                 <button type="button" onclick="changeTemperature(-1)">-</button>
@@ -92,11 +92,11 @@
             var currentTemp = parseInt(document.getElementById('temperature').innerText);
             var newTemp = currentTemp + change;
             
-            postData('temperature',newTemp)
+            postData('acTemperature',newTemp)
             document.getElementById('temperature').innerText = newTemp + "°C";
         }
 
-        var selectElement1 = document.getElementById("mode");
+        var selectElement1 = document.getElementById("acMode");
 
         var selectElement2 = document.getElementById("fanSpeed");
 
